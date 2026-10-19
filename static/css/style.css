@@ -1,21 +1,29 @@
-
-/* Main page colors */
+/* Main page */
 body {
+    margin: 0;
+    font-family: Arial, sans-serif;
     background-color: #f0f4f8;
     color: #263238;
-    font-family: Arial, sans-serif;
 }
 
-/* Main headings */
-h1, h2, h3 {
-    color: #2c5282;
+/* Title section */
+.site-header {
+    background-color: #2c5282;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
 }
 
-/* Links */
-a {
-    color: #3182ce;
+/* Main title */
+.site-header h1 {
+    margin: 0;
+    font-size: 40px;
+    color: white;
 }
 
-a:hover {
-    color: #2b6cb0;
+/* Subtitle */
+.site-header p {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #e2e8f0;
 }
