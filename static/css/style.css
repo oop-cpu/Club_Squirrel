@@ -1,0 +1,29 @@
+/* Main page */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #263238;
+}
+
+/* Title section */
+.site-header {
+    background-color: #2c5282;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+/* Main title */
+.site-header h1 {
+    margin: 0;
+    font-size: 40px;
+    color: white;
+}
+
+/* Subtitle */
+.site-header p {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #e2e8f0;
+}
