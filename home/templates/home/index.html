@@ -12,12 +12,14 @@
         <h1>Club Squirrel</h1>
         <p>Chat, connect, and be a squirrel!</p>
     </header>
-    <br></br>
-    <div class="button-div">
-        <button href="{% url 'home:index' %}" class="menu-button">Play</button>
-        <button href="{% url 'home:index' %}" class="menu-button">Join</button>
-        <button href="{% url 'home:index' %}" class="menu-button">Settings</button>
-        <button href="{% url 'home:index' %}" class="menu-button">Help</button>
-    </div class="button-div">
+    <div class="horz-div">
+        <img src="{% static 'images/squirrelwithsword.png' %}" alt="Squirrel with a sword">
+        <div class="button-div">
+            <a href="{% url 'gameRoom:gameR' %}" class="menu-button">Play</a>
+            <button href="{% url 'home:index' %}" class="menu-button">Join</button>
+            <button href="{% url 'home:index' %}" class="menu-button">Settings</button>
+            <button href="{% url 'home:index' %}" class="menu-button">Help</button>
+        </div>
+    </div>
 </body>
 </html>

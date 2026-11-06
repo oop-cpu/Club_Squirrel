@@ -6,6 +6,7 @@ from django.views.static import serve
 urlpatterns = [
     path('nqklejbn/', admin.site.urls),
     path('', include('home.urls')),
+    path('play/', include('gameRoom.urls')),
     # Force production media serving
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
