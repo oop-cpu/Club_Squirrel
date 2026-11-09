@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 
     # Local Project Apps
     'home',
+    'gameRoom',
 ]
 
 MIDDLEWARE = [
