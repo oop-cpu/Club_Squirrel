@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in | Club Squirrel</title>
+    <link rel="stylesheet" href="{% static 'login/login.css' %}">
+</head>
+<body>
+    <header class="login-header">
+        <a class="brand" href="{% url 'home:index' %}">Club Squirrel</a>
+        <span>Find your people in the forest.</span>
+    </header>
+    <main class="login-layout">
+        <section class="welcome-copy" aria-label="Welcome">
+            <p class="eyebrow">Your den is waiting</p>
+            <h1>Come on in.</h1>
+            <p>Catch up with friends, meet new squirrels, and pick up where the fun left off.</p>
+        </section>
+        <form class="login-form" method="post">
+            {% csrf_token %}
+            <h2>Log in</h2>
+            <p class="form-intro">Welcome back to Club Squirrel.</p>
+            {% if form.errors %}
+                <p class="login-error" role="alert">That username and password did not match.</p>
+            {% endif %}
+            <label for="id_username">Username</label>
+            <input id="id_username" type="text" name="username" autocomplete="username" required autofocus>
+            <label for="id_password">Password</label>
+            <input id="id_password" type="password" name="password" autocomplete="current-password" required>
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            <button type="submit">Log in</button>
+        </form>
+    </main>
+</body>
+</html>

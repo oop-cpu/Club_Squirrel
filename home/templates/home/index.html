@@ -16,7 +16,7 @@
         <img src="{% static 'images/squirrelwithsword.png' %}" alt="Squirrel with a sword">
         <div class="button-div">
             <a href="{% url 'gameRoom:gameR' %}" class="menu-button">Play</a>
-            <button href="{% url 'home:index' %}" class="menu-button">Join</button>
+            <a href="{% url 'login:index' %}" class="menu-button">Join</a>
             <button href="{% url 'home:index' %}" class="menu-button">Settings</button>
             <button href="{% url 'home:index' %}" class="menu-button">Help</button>
         </div>
