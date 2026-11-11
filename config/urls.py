@@ -7,6 +7,7 @@ urlpatterns = [
     path('nqklejbn/', admin.site.urls),
     path('', include('home.urls')),
     path('play/', include('gameRoom.urls')),
+    path('login/', include('login.urls')),
     # Force production media serving
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
