@@ -77,7 +77,7 @@ body {
         sans-serif;
     font-size: 16px;
     font-weight: 500;
-    height: 170px;
+    height: 125px;
     padding: 0;
     display: flex;
     align-items: center;
@@ -89,7 +89,7 @@ body {
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    width: 150px;
+    width: 170px;
 }
 
 /* Acorn image */
@@ -107,13 +107,21 @@ body {
 .menu-button span {
     position: relative;
     z-index: 1;
-    padding: 6px;
-    border: 1px solid rgba(255, 246, 232, 0.75);
-    border-radius: 50px;
-    background-color: rgba(23, 35, 33, 0.9);
-    color: #fff6e8;
-    font-weight: 700;
-    text-shadow: none;
+    padding: 5px 8px;
+
+    background: transparent;
+    border: none;
+    border-radius: 0;
+
+    color: #fff0cc;
+    font-family: Georgia, serif;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+
+    text-shadow:
+        1px 1px 2px #3e2412,
+        -1px -1px 2px #3e2412;
 }
 
 /* Button hover */
@@ -156,26 +164,30 @@ body {
 }
 
 /* Squirrel image */
-.horz-div img {
-    width: min(300px, 100%);
+.horz-div > img {
+    position: fixed;
+    left: 16%;
+    bottom: 5%;
+
+    width: min(300px, 30vw);
     height: auto;
     filter: brightness(0.7);
-    grid-column: 1;
-    justify-self: end;
+
+    z-index: 1;
 }
+
 
 /* Responsive homepage */
 @media (max-width: 800px) {
-    .horz-div {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 24px;
-    }
-
-    .horz-div img,
     .button-div {
-        grid-column: 1;
-        justify-self: center;
-    }
+    grid-column: 1;
+    justify-self: center;
+}
+
+.horz-div > img {
+    position: static;
+    width: min(250px, 70vw);
+    justify-self: center;
 }
 
 @media (max-width: 480px) {
