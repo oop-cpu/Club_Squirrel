@@ -15,10 +15,22 @@
     <div class="horz-div">
         <img src="{% static 'images/squirrelwithsword.png' %}" alt="Squirrel with a sword">
         <div class="button-div">
-            <a href="{% url 'gameRoom:gameR' %}" class="menu-button">Play</a>
-            <a href="{% url 'login:index' %}" class="menu-button">Join</a>
-            <button href="{% url 'home:index' %}" class="menu-button">Settings</button>
-            <button href="{% url 'home:index' %}" class="menu-button">Help</button>
+            <a href="{% url 'gameRoom:gameR' %}" class="menu-button">
+                <img class="button-acorn" src="{% static 'images/good_acorn.png' %}" alt="">
+                <span>Play</span>
+            </a>
+            <a href="{% url 'login:index' %}" class="menu-button">
+                <img class="button-acorn" src="{% static 'images/good_acorn.png' %}" alt="">
+                <span>Join</span>
+            </a>
+            <button href="{% url 'home:index' %}" class="menu-button">
+                <img class="button-acorn" src="{% static 'images/good_acorn.png' %}" alt="">
+                <span>Settings</span>
+            </button>
+            <button href="{% url 'home:index' %}" class="menu-button">
+                <img class="button-acorn" src="{% static 'images/good_acorn.png' %}" alt="">
+                <span>Help</span>
+            </button>
         </div>
     </div>
 </body>
