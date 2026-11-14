@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Settings - Club Squirrel</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="settings-page">
+
+    <main class="settings-container">
+        <h1>Player Settings</h1>
+        <p>Customize your squirrel experience!</p>
+
+        <div class="settings-group">
+            <h2>Player Profile</h2>
+
+            <label for="playerName">Player Name</label>
+            <input type="text" id="playerName"
+                   placeholder="Enter your squirrel name">
+        </div>
+
+        <div class="settings-group">
+            <h2>Audio Settings</h2>
+
+            <label for="musicVolume">Music Volume</label>
+            <input type="range" id="musicVolume"
+                   min="0" max="100" value="50">
+            <span id="musicValue">50%</span>
+
+            <label for="soundVolume">Sound Effects</label>
+            <input type="range" id="soundVolume"
+                   min="0" max="100" value="50">
+            <span id="soundValue">50%</span>
+
+            <label for="muteAudio">
+                <input type="checkbox" id="muteAudio">
+                Mute All Sounds
+            </label>
+        </div>
+
+        <button type="button" id="saveSettings">
+            Save Settings
+        </button>
+
+        <a href="{% url 'home:index' %}" class="back-button">
+            Back to Homepage
+        </a>
+
+        <p id="saveMessage" role="status"></p>
+    </main>
+
+    <script>
+        const music = document.getElementById("musicVolume");
+        const sound = document.getElementById("soundVolume");
+        const musicValue = document.getElementById("musicValue");
+        const soundValue = document.getElementById("soundValue");
+
+        music.addEventListener("input", () => {
+            musicValue.textContent = music.value + "%";
+        });
+
+        sound.addEventListener("input", () => {
+            soundValue.textContent = sound.value + "%";
+        });
+
+        document.getElementById("saveSettings")
+            .addEventListener("click", () => {
+                const settings = {
+                    playerName: document.getElementById("playerName").value,
+                    musicVolume: music.value,
+                    soundVolume: sound.value,
+                    muteAudio: document.getElementById("muteAudio").checked
+                };
+
+                localStorage.setItem(
+                    "clubSquirrelSettings",
+                    JSON.stringify(settings)
+                );
+
+                document.getElementById("saveMessage").textContent =
+                    "Settings saved!";
+            });
+
+        const saved = JSON.parse(
+            localStorage.getItem("clubSquirrelSettings") || "null"
+        );
+
+        if (saved) {
+            document.getElementById("playerName").value =
+                saved.playerName || "";
+
+            music.value = saved.musicVolume ?? 50;
+            sound.value = saved.soundVolume ?? 50;
+
+            document.getElementById("muteAudio").checked =
+                saved.muteAudio ?? false;
+
+            musicValue.textContent = music.value + "%";
+            soundValue.textContent = sound.value + "%";
+        }
+    </script>
+</body>
+</html>
