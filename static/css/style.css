@@ -461,3 +461,44 @@ body {
         padding: 15px;
     }
 }
+
+/* Center login and registration pages */
+body:has(.login-layout) {
+    min-height: 100vh;
+    justify-content: center;
+}
+
+/* Login and registration layout */
+.login-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+    min-height: auto;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Login and registration forms */
+.login-form {
+    width: 100%;
+    max-width: 450px;
+    padding: 30px;
+    box-sizing: border-box;
+    border: 3px solid #c47b3a;
+    border-radius: 15px;
+    background-color: #f7f4e9;
+}
+
+/* Keep forms centered on smaller screens */
+@media (max-width: 600px) {
+    .login-layout {
+        padding: 15px;
+    }
+
+    .login-form {
+        padding: 20px;
+    }
+}

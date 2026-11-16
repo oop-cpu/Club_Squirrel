@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log in | Club Squirrel</title>
-    <link rel="stylesheet" href="{% static '../static/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <header class="site-header">
@@ -29,6 +29,10 @@
             <input id="id_password" type="password" name="password" autocomplete="current-password" required>
             {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
             <button type="submit">Log in</button>
+                <p>
+                    Don't have an account?
+                    <a href="{% url 'login:register' %}">Create Account</a>
+                </p>
         </form>
     </main>
 </body>
