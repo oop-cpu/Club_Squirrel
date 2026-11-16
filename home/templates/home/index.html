@@ -29,6 +29,17 @@
                 <span>Settings</span>
             </a>
 
+            {% if user.is_authenticated %}
+               <form action="{% url 'login:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="menu-button">
+                        <img class="button-acorn"
+                            src="{% static 'images/good_acorn.png' %}" alt="">
+                    <span>Logout</span>
+                    </button>
+                </form>
+            {% endif %}
+
             <button href="{% url 'home:index' %}" class="menu-button">
                 <img class="button-acorn" src="{% static 'images/good_acorn.png' %}" alt="">
                 <span>Help</span>

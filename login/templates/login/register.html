@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Club Squirrel</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <h1>Club Squirrel</h1>
+        <a href="{% url 'home:index' %}" class="menu-button">
+            <img class="button-acorn"
+                 src="{% static 'images/good_acorn.png' %}" alt="">
+            <span>Home</span>
+        </a>
+    </header>
+
+    <main class="login-layout">
+        <form class="login-form" method="post">
+            {% csrf_token %}
+
+            <h2>Create Account</h2>
+            <p class="form-intro">
+                Join Club Squirrel and start your adventure!
+            </p>
+
+            {% if form.non_field_errors %}
+                <div class="login-error" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <label for="id_username">Username</label>
+            <input type="text" id="id_username"
+                   name="username" autocomplete="username"
+                   value="{{ form.username.value|default_if_none:'' }}"
+                   required>
+            {{ form.username.errors }}
+
+            <label for="id_password1">Password</label>
+            <input type="password" id="id_password1"
+                   name="password1" autocomplete="new-password"
+                   required>
+            {{ form.password1.errors }}
+
+            <label for="id_password2">Confirm Password</label>
+            <input type="password" id="id_password2"
+                   name="password2" autocomplete="new-password"
+                   required>
+            {{ form.password2.errors }}
+
+            <button type="submit">Create Account</button>
+
+            <p>
+                Already have an account?
+                <a href="{% url 'login:index' %}">Log in</a>
+            </p>
+        </form>
+    </main>
+</body>
+</html>
