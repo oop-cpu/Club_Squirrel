@@ -16,6 +16,12 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            print("==============")
+            print(user)
+            print(user.id)
+            print(user.username)
+            print(user.password)
+            print("==============")
             return redirect('home:index')
     else:
         form = UserCreationForm()
