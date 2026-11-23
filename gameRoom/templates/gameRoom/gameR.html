@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Room | Club Squirrel</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="game-room-body">
+    <header class="site-header game-room-header">
+        <h1>Club Squirrel</h1>
+        <a href="{% url 'home:index' %}" class="menu-button">
+            <img class="button-acorn" src="{% static 'images/good_acorn.png' %}" alt="">
+            <span>Home</span>
+        </a>
+    </header>
+
+    <main class="game-room">
+        <section class="game-panel" aria-labelledby="room-title">
+            <div class="room-heading">
+                <h2 id="room-title">Game Room</h2>
+                <p id="connection-status" role="status" aria-live="polite">Connecting...</p>
+            </div>
+            <p class="room-instructions">Use WASD or the arrow keys to move. Up to five players can join.</p>
+            <div id="play-area" class="play-area" tabindex="0" aria-label="Game area. Focus here and use WASD or arrow keys to move.">
+                <div id="players" class="players"></div>
+            </div>
+            <p id="room-message" class="room-message" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="chat-panel" aria-labelledby="chat-title">
+            <h2 id="chat-title">Room Chat</h2>
+            <ol id="chat-messages" class="chat-messages" aria-live="polite" aria-relevant="additions"></ol>
+            <form id="chat-form" class="chat-form">
+                <label for="chat-input">Message</label>
+                <div class="chat-controls">
+                    <input id="chat-input" name="message" type="text" maxlength="300" autocomplete="off" required>
+                    <button id="chat-send" type="submit" disabled>Send</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    {{ request.user.get_username|json_script:"room-username" }}
+    <script>
+        (() => {
+            const status = document.getElementById('connection-status');
+            const roomMessage = document.getElementById('room-message');
+            const playArea = document.getElementById('play-area');
+            const playersElement = document.getElementById('players');
+            const chatMessages = document.getElementById('chat-messages');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatSend = document.getElementById('chat-send');
+            const username = JSON.parse(document.getElementById('room-username').textContent);
+            const players = new Map();
+            let ownPlayerId = null;
+            let socketReady = false;
+            let x = 50;
+            let y = 50;
+
+            const socketScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const socket = new WebSocket(`${socketScheme}//${window.location.host}/ws/room/`);
+
+            function setConnectionState(message, connected = false) {
+                status.textContent = message;
+                socketReady = connected;
+                chatSend.disabled = !connected;
+            }
+
+            function renderPlayer(player) {
+                let element = players.get(player.id);
+                if (!element) {
+                    element = document.createElement('div');
+                    element.className = 'player-name';
+                    element.dataset.playerId = player.id;
+                    element.setAttribute('aria-label', `${player.name}${player.id === ownPlayerId ? ', you' : ''}`);
+                    playersElement.appendChild(element);
+                    players.set(player.id, element);
+                }
+                element.textContent = player.id === ownPlayerId ? `${player.name} (you)` : player.name;
+                element.style.left = `${player.x}%`;
+                element.style.top = `${player.y}%`;
+                element.classList.toggle('is-self', player.id === ownPlayerId);
+                element.setAttribute('aria-label', `${player.name}${player.id === ownPlayerId ? ', you' : ''}`);
+            }
+
+            function removePlayer(playerId) {
+                const element = players.get(playerId);
+                if (element) {
+                    element.remove();
+                    players.delete(playerId);
+                }
+            }
+
+            function addChatMessage(name, message) {
+                const item = document.createElement('li');
+                const sender = document.createElement('strong');
+                sender.textContent = `${name}: `;
+                item.append(sender, document.createTextNode(message));
+                chatMessages.appendChild(item);
+                while (chatMessages.children.length > 100) {
+                    chatMessages.firstElementChild.remove();
+                }
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            socket.addEventListener('open', () => {
+                setConnectionState('Connected', true);
+                playArea.focus();
+            });
+
+            socket.addEventListener('message', (event) => {
+                let data;
+                try {
+                    data = JSON.parse(event.data);
+                } catch {
+                    roomMessage.textContent = 'Received an invalid room update.';
+                    return;
+                }
+
+                if (data.type === 'players') {
+                    players.clear();
+                    playersElement.replaceChildren();
+                    ownPlayerId = data.self_id;
+                    const ownPlayer = data.players.find((player) => player.id === ownPlayerId);
+                    if (ownPlayer) {
+                        x = ownPlayer.x;
+                        y = ownPlayer.y;
+                    }
+                    data.players.forEach(renderPlayer);
+                } else if (data.type === 'player_joined' || data.type === 'player_moved') {
+                    renderPlayer(data.player);
+                } else if (data.type === 'player_left') {
+                    removePlayer(data.player_id);
+                } else if (data.type === 'chat') {
+                    addChatMessage(data.name, data.message);
+                } else if (data.type === 'error') {
+                    roomMessage.textContent = data.message;
+                }
+            });
+
+            socket.addEventListener('close', (event) => {
+                if (event.code === 4401) {
+                    setConnectionState('Log in to join the room.');
+                } else if (event.code === 4429) {
+                    setConnectionState('Room full (5 players maximum).');
+                } else {
+                    setConnectionState('Disconnected from the room.');
+                }
+            });
+
+            socket.addEventListener('error', () => {
+                setConnectionState('Could not connect to the room.');
+            });
+
+            window.addEventListener('pagehide', () => {
+                if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
+                    socket.close(1000, 'Leaving room');
+                }
+            });
+
+            playArea.addEventListener('click', () => playArea.focus());
+            playArea.addEventListener('keydown', (event) => {
+                const directions = {
+                    ArrowUp: [0, -2],
+                    w: [0, -2],
+                    W: [0, -2],
+                    ArrowDown: [0, 2],
+                    s: [0, 2],
+                    S: [0, 2],
+                    ArrowLeft: [-2, 0],
+                    a: [-2, 0],
+                    A: [-2, 0],
+                    ArrowRight: [2, 0],
+                    d: [2, 0],
+                    D: [2, 0],
+                };
+                const direction = directions[event.key];
+                if (!direction || !socketReady || ownPlayerId === null) {
+                    return;
+                }
+                event.preventDefault();
+                x = Math.max(0, Math.min(100, x + direction[0]));
+                y = Math.max(0, Math.min(100, y + direction[1]));
+                renderPlayer({id: ownPlayerId, name: username, x, y});
+                socket.send(JSON.stringify({type: 'move', x, y}));
+            });
+
+            chatForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const message = chatInput.value.trim();
+                if (!message || !socketReady || message.length > 300) {
+                    return;
+                }
+                socket.send(JSON.stringify({type: 'chat', message}));
+                chatInput.value = '';
+                roomMessage.textContent = '';
+            });
+        })();
+    </script>
+</body>
+</html>
