@@ -5,3 +5,6 @@ def index(request):
 
 def settings_page(request):
     return render(request, 'home/settings.html')
+
+def help_page(request):
+    return render(request, 'home/help.html')
