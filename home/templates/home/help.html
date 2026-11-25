@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Squirrel - Help</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    <header class="site-header">
+        <h1>Help Center</h1>
+        <p>Everything you need to know about Club Squirrel!</p>
+    </header>
+
+    <main class="help-container">
+
+        <section class="help-section">
+            <h2>Welcome to Club Squirrel</h2>
+            <p>Club Squirrel is a social game where you can meet
+                new people, chat, and hang out with friends.</p>
+        </section>
+
+        <section class="help-section">
+            <h2>Getting Started</h2>
+            <ol>
+                <li>Click Join on the main menu.</li>
+                <li>Create an account if you are a new player.</li>
+                <li>Log in using your username and password.</li>
+                <li>Return to the main menu and select Play.</li>
+            </ol>
+        </section>
+
+        <section class="help-section">
+            <h2>How to Play</h2>
+            <p>Click Play on the main menu to enter the game room.
+                Connect with other players and enjoy spending time
+                with your friends.</p>
+        </section>
+
+        <section class="help-section">
+            <h2>Chatting with Players</h2>
+            <p>Use the chat box in the game room to communicate
+                with other players. Type your message and use
+                the send button.</p>
+            <p>Remember to respect other players and avoid
+                sharing personal information.</p>
+        </section>
+
+        <section class="help-section">
+            <h2>Player Settings</h2>
+            <p>Click Settings on the main menu to customize
+                your game experience.</p>
+            <ul>
+                <li>Change your player name.</li>
+                <li>Adjust volume preferences.</li>
+                <li>Mute game audio.</li>
+                <li>Save your settings.</li>
+            </ul>
+        </section>
+
+        <section class="help-section">
+            <h2>Frequently Asked Questions</h2>
+
+            <details>
+                <summary>Why can't I log in?</summary>
+                <p>Make sure your username and password are correct.
+                    If you do not have an account, register first.</p>
+            </details>
+
+            <details>
+                <summary>Why isn't the game loading?</summary>
+                <p>Check your internet connection and refresh
+                    the page. Try returning to the main menu
+                    and selecting Play again.</p>
+            </details>
+
+            <details>
+                <summary>Why can't I send messages?</summary>
+                <p>Check your connection to the game room.
+                    Try refreshing the page if you are disconnected.</p>
+            </details>
+
+            <details>
+                <summary>How do I change my settings?</summary>
+                <p>Return to the main menu, select Settings,
+                    adjust your preferences, and click Save.</p>
+            </details>
+
+            <details>
+                <summary>How do I log out?</summary>
+                <p>Return to the main menu and click Logout
+                    when you are signed in.</p>
+            </details>
+
+        </section>
+
+        <a href="{% url 'home:index' %}" class="back-button">
+            Back to Home
+        </a>
+
+    </main>
+
+</body>
+</html>

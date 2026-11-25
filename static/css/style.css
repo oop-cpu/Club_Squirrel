@@ -709,3 +709,87 @@ body:has(.login-layout) {
         max-height: 32vh;
     }
 }
+/* Help page container */
+.help-container {
+    width: 92%;
+    max-width: 900px;
+    margin: 0 auto 40px;
+    padding: 30px;
+    box-sizing: border-box;
+    background-color: rgba(62, 39, 22, 0.93);
+    border: 4px solid #c47b3a;
+    border-radius: 20px;
+    color: #fff6e8;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Help sections */
+.help-section {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: rgba(101, 67, 33, 0.65);
+    border: 2px solid #a97443;
+    border-radius: 12px;
+}
+
+/* Section titles */
+.help-section h2 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #fff0cc;
+}
+
+/* Help instructions */
+.help-section p,
+.help-section li {
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+/* FAQ boxes */
+.help-section details {
+    margin: 12px 0;
+    padding: 15px;
+    background-color: rgba(62, 39, 22, 0.7);
+    border: 1px solid #c47b3a;
+    border-radius: 8px;
+}
+
+/* FAQ questions */
+.help-section summary {
+    color: #fff0cc;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.help-section summary:hover {
+    color: #ffcc80;
+}
+
+/* FAQ answers */
+.help-section details p {
+    margin-bottom: 0;
+}
+
+/* Center back button */
+.help-container > .back-button {
+    display: block;
+    width: fit-content;
+    margin: 25px auto 0;
+    text-align: center;
+}
+
+/* Mobile help page */
+@media (max-width: 600px) {
+    .help-container {
+        padding: 15px;
+    }
+
+    .help-section {
+        padding: 15px;
+    }
+
+    .help-section h2 {
+        font-size: 20px;
+    }
+}
