@@ -12,6 +12,7 @@ ROOM_GROUP = 'game-room'
 MAX_PLAYERS = 5
 PLAYER_LEASE_SECONDS = 90
 HEARTBEAT_SECONDS = 30
+MOVE_INTERVAL_SECONDS = 0.05
 MAX_CHAT_LENGTH = 300
 ROOM_MEMBERS_KEY = 'game-room:members'
 ROOM_PLAYERS_KEY = 'game-room:players'
@@ -35,21 +36,18 @@ redis.call('HSET', KEYS[2], ARGV[4], ARGV[5])
 return {1, existing, expired}
 """
 
-EXPIRE_PLAYERS_SCRIPT = """
+HEARTBEAT_SCRIPT = """
 local expired = redis.call('ZRANGEBYSCORE', KEYS[1], '-inf', ARGV[1])
 for _, player_id in ipairs(expired) do
     redis.call('HDEL', KEYS[2], player_id)
 end
 redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', ARGV[1])
-return expired
-"""
-
-HEARTBEAT_SCRIPT = """
-if redis.call('ZSCORE', KEYS[1], ARGV[1]) then
-    redis.call('ZADD', KEYS[1], ARGV[2], ARGV[1])
-    return 1
+local renewed = 0
+if redis.call('ZSCORE', KEYS[1], ARGV[2]) then
+    redis.call('ZADD', KEYS[1], ARGV[3], ARGV[2])
+    renewed = 1
 end
-return 0
+return {expired, renewed}
 """
 
 UPDATE_PLAYER_SCRIPT = """
@@ -111,6 +109,7 @@ class GameRoomConsumer(AsyncJsonWebsocketConsumer):
             'y': 50,
         }
         self.joined = False
+        self.last_move_at = None
         await self.channel_layer.group_add(ROOM_GROUP, self.channel_name)
 
         if settings.REDIS_URL:
@@ -188,11 +187,18 @@ class GameRoomConsumer(AsyncJsonWebsocketConsumer):
             await self._send_error('Position values must be between 0 and 100.')
             return
 
+        now = time.monotonic()
+        if (
+            self.last_move_at is not None
+            and now - self.last_move_at < MOVE_INTERVAL_SECONDS
+        ):
+            return
+        self.last_move_at = now
+
         self.player['x'] = x
         self.player['y'] = y
         if settings.REDIS_URL:
             client = await _redis()
-            now = _now_ms()
             updated = await client.eval(
                 UPDATE_PLAYER_SCRIPT,
                 2,
@@ -249,17 +255,12 @@ class GameRoomConsumer(AsyncJsonWebsocketConsumer):
             expires_at = _now_ms() + PLAYER_LEASE_SECONDS * 1000
             if settings.REDIS_URL:
                 client = await _redis()
-                expired = await client.eval(
-                    EXPIRE_PLAYERS_SCRIPT,
+                expired, renewed = await client.eval(
+                    HEARTBEAT_SCRIPT,
                     2,
                     ROOM_MEMBERS_KEY,
                     ROOM_PLAYERS_KEY,
                     _now_ms(),
-                )
-                renewed = await client.eval(
-                    HEARTBEAT_SCRIPT,
-                    1,
-                    ROOM_MEMBERS_KEY,
                     self.player_id,
                     expires_at,
                 )
