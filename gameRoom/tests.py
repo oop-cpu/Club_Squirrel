@@ -1,5 +1,6 @@
 import time
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth.models import AnonymousUser
@@ -120,6 +121,36 @@ class RoomMessageTests(SimpleTestCase):
                 'player_id': first_initial['self_id'],
             })
         finally:
+            await second.disconnect()
+
+    async def test_rapid_movement_updates_are_rate_limited(self):
+        await self._reset_local_players()
+        first = WebsocketCommunicator(
+            authenticated_room_app('first'),
+            '/ws/room/',
+        )
+        second = WebsocketCommunicator(
+            authenticated_room_app('second'),
+            '/ws/room/',
+        )
+        try:
+            self.assertTrue((await first.connect())[0])
+            first_initial = await first.receive_json_from()
+            self.assertTrue((await second.connect())[0])
+            await second.receive_json_from()
+            await first.receive_json_from()
+
+            with patch('gameRoom.consumers.MOVE_INTERVAL_SECONDS', 10):
+                await first.send_json_to({'type': 'move', 'x': 52, 'y': 50})
+                movement = await second.receive_json_from()
+                self.assertEqual(movement['type'], 'player_moved')
+
+                await first.send_json_to({'type': 'move', 'x': 54, 'y': 50})
+                with _local_players_lock:
+                    player = _local_players[ROOM_GROUP][first_initial['self_id']][1]
+                self.assertEqual(player['x'], 52)
+        finally:
+            await first.disconnect()
             await second.disconnect()
 
 

@@ -59,9 +59,32 @@
             let socketReady = false;
             let x = 50;
             let y = 50;
+            let lastMoveSentAt = 0;
+            let moveSendTimer = null;
+            const moveSendInterval = 100;
 
             const socketScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const socket = new WebSocket(`${socketScheme}//${window.location.host}/ws/room/`);
+
+            function sendMove() {
+                if (!socketReady || ownPlayerId === null) {
+                    return;
+                }
+                const elapsed = performance.now() - lastMoveSentAt;
+                if (elapsed >= moveSendInterval) {
+                    if (moveSendTimer !== null) {
+                        clearTimeout(moveSendTimer);
+                        moveSendTimer = null;
+                    }
+                    socket.send(JSON.stringify({type: 'move', x, y}));
+                    lastMoveSentAt = performance.now();
+                } else if (moveSendTimer === null) {
+                    moveSendTimer = window.setTimeout(() => {
+                        moveSendTimer = null;
+                        sendMove();
+                    }, moveSendInterval - elapsed);
+                }
+            }
 
             function setConnectionState(message, connected = false) {
                 status.textContent = message;
@@ -185,7 +208,7 @@
                 x = Math.max(0, Math.min(100, x + direction[0]));
                 y = Math.max(0, Math.min(100, y + direction[1]));
                 renderPlayer({id: ownPlayerId, name: username, x, y});
-                socket.send(JSON.stringify({type: 'move', x, y}));
+                sendMove();
             });
 
             chatForm.addEventListener('submit', (event) => {
