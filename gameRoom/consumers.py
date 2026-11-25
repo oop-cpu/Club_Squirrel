@@ -199,6 +199,7 @@ class GameRoomConsumer(AsyncJsonWebsocketConsumer):
         self.player['y'] = y
         if settings.REDIS_URL:
             client = await _redis()
+            expires_at = _now_ms() + PLAYER_LEASE_SECONDS * 1000
             updated = await client.eval(
                 UPDATE_PLAYER_SCRIPT,
                 2,
@@ -206,7 +207,7 @@ class GameRoomConsumer(AsyncJsonWebsocketConsumer):
                 ROOM_PLAYERS_KEY,
                 self.player_id,
                 json.dumps(self.player),
-                now + PLAYER_LEASE_SECONDS * 1000,
+                expires_at,
             )
             if not updated:
                 await self.close(code=1011)
