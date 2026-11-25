@@ -10,7 +10,7 @@ Squirrel Club is a social connecting game where you can be a squirrel and meet p
 | As a user, I want a settings, so I can customize my game experience. | Completed |
 | As a user, I want a game screen with connection to other players, so I can play the game. | In progress |
 | As a developer, I want a back-end, so each page connects data to work together. | In progress |
-| As a user, I want a help page, so I can solve problems I may have with the website. | Pending |
+| As a user, I want a help page, so I can solve problems I may have with the website. | Completed |
 ## Figma Prototype:
 [https://www.figma.com/proto/fXaHNbSBPtaSMScVMkrjuk/Club-Squirrel-%E2%80%93-Second-Preliminary-Delivery?node-id=1-2&p=f&t=PMUj5xMvb8esImX8-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2](https://www.figma.com/proto/fXaHNbSBPtaSMScVMkrjuk/Club-Squirrel-%E2%80%93-Second-Preliminary-Delivery?node-id=1-2&p=f&t=PMUj5xMvb8esImX8-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2)
 ## Additional Planning Information:
