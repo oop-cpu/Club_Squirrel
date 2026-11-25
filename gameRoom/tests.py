@@ -153,6 +153,57 @@ class RoomMessageTests(SimpleTestCase):
             await first.disconnect()
             await second.disconnect()
 
+    @override_settings(
+        REDIS_URL='redis://localhost:6379',
+        CHANNEL_LAYERS={
+            'default': {'BACKEND': 'channels.layers.InMemoryChannelLayer'},
+        },
+    )
+    async def test_redis_movement_lease_uses_epoch_milliseconds(self):
+        class FakeRedis:
+            def __init__(self):
+                self.calls = []
+
+            async def eval(self, *args):
+                self.calls.append(args)
+                if len(self.calls) <= 2:
+                    return [1, [], []]
+                return 1
+
+        fake_redis = FakeRedis()
+
+        async def get_fake_redis():
+            return fake_redis
+
+        first = WebsocketCommunicator(
+            authenticated_room_app('first'),
+            '/ws/room/',
+        )
+        second = WebsocketCommunicator(
+            authenticated_room_app('second'),
+            '/ws/room/',
+        )
+        with patch('gameRoom.consumers._redis', get_fake_redis):
+            try:
+                self.assertTrue((await first.connect())[0])
+                await first.receive_json_from()
+                self.assertTrue((await second.connect())[0])
+                await second.receive_json_from()
+                await first.receive_json_from()
+                await first.send_json_to({'type': 'move', 'x': 52, 'y': 50})
+                self.assertEqual(
+                    (await second.receive_json_from())['type'],
+                    'player_moved',
+                )
+
+                movement_expiry = fake_redis.calls[2][-1]
+                expected_expiry = int(time.time() * 1000) + 90_000
+                self.assertGreaterEqual(movement_expiry, expected_expiry - 1_000)
+                self.assertLessEqual(movement_expiry, expected_expiry + 1_000)
+            finally:
+                await first.disconnect()
+                await second.disconnect()
+
 
 @override_settings(REDIS_URL=None)
 class RoomPresenceTests(SimpleTestCase):
