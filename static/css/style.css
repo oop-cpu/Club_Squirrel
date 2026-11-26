@@ -203,6 +203,48 @@ body {
     }
 }
 
+@media (max-width: 600px) {
+    .horz-div {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+        padding: 8px 16px 24px;
+    }
+
+    .horz-div > img {
+        width: min(230px, 65vw);
+        max-height: 25vh;
+        object-fit: contain;
+    }
+
+    .button-div {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        justify-self: center;
+        width: min(220px, 100%);
+        gap: 0;
+    }
+
+    .button-div > .menu-button {
+        width: 100%;
+        height: 100px;
+    }
+
+    .button-div form {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .button-div form .menu-button {
+        width: 100%;
+        height: 100px;
+    }
+
+    .button-div .menu-button span {
+        font-size: 18px;
+    }
+}
+
 /* Login header */
 .login-header {
     display: flex;
@@ -615,6 +657,10 @@ body:has(.login-layout) {
     color: #a52e24;
 }
 
+.touch-controls {
+    display: none;
+}
+
 .chat-panel {
     display: flex;
     flex-direction: column;
@@ -702,6 +748,61 @@ body:has(.login-layout) {
     .play-area {
         height: 50vh;
         min-height: 280px;
+    }
+
+    .touch-controls {
+        display: grid;
+        grid-template-columns: repeat(3, 56px);
+        grid-template-rows: repeat(2, 56px);
+        justify-content: center;
+        gap: 6px;
+        margin: 14px auto 4px;
+        touch-action: manipulation;
+    }
+
+    .touch-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        color: #fff6e8;
+        background: #315e4d;
+        border: 2px solid #c47b3a;
+        border-radius: 10px;
+        font-size: 22px;
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .touch-control:active {
+        background: #244b3c;
+        transform: scale(0.96);
+    }
+
+    .touch-control:focus-visible {
+        outline: 3px solid #c47b3a;
+        outline-offset: 2px;
+    }
+
+    .touch-up {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .touch-left {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .touch-down {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .touch-right {
+        grid-column: 3;
+        grid-row: 2;
     }
 
     .chat-messages {
