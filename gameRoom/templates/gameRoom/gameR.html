@@ -22,9 +22,15 @@
                 <h2 id="room-title">Game Room</h2>
                 <p id="connection-status" role="status" aria-live="polite">Connecting...</p>
             </div>
-            <p class="room-instructions">Use WASD or the arrow keys to move. Up to five players can join.</p>
+            <p class="room-instructions">Use WASD, the arrow keys, or the touch controls to move. Up to five players can join.</p>
             <div id="play-area" class="play-area" tabindex="0" aria-label="Game area. Focus here and use WASD or arrow keys to move.">
                 <div id="players" class="players"></div>
+            </div>
+            <div class="touch-controls" role="group" aria-label="Movement controls">
+                <button type="button" class="touch-control touch-up" data-direction="up" aria-label="Move up">▲</button>
+                <button type="button" class="touch-control touch-left" data-direction="left" aria-label="Move left">◀</button>
+                <button type="button" class="touch-control touch-down" data-direction="down" aria-label="Move down">▼</button>
+                <button type="button" class="touch-control touch-right" data-direction="right" aria-label="Move right">▶</button>
             </div>
             <p id="room-message" class="room-message" role="status" aria-live="polite"></p>
         </section>
@@ -53,6 +59,7 @@
             const chatForm = document.getElementById('chat-form');
             const chatInput = document.getElementById('chat-input');
             const chatSend = document.getElementById('chat-send');
+            const touchControls = document.querySelector('.touch-controls');
             const username = JSON.parse(document.getElementById('room-username').textContent);
             const players = new Map();
             let ownPlayerId = null;
@@ -61,6 +68,7 @@
             let y = 50;
             let lastMoveSentAt = 0;
             let moveSendTimer = null;
+            let heldMoveTimer = null;
             const moveSendInterval = 100;
 
             const socketScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -83,6 +91,23 @@
                         moveSendTimer = null;
                         sendMove();
                     }, moveSendInterval - elapsed);
+                }
+            }
+
+            function movePlayer(dx, dy) {
+                if (!socketReady || ownPlayerId === null) {
+                    return;
+                }
+                x = Math.max(0, Math.min(100, x + dx));
+                y = Math.max(0, Math.min(100, y + dy));
+                renderPlayer({id: ownPlayerId, name: username, x, y});
+                sendMove();
+            }
+
+            function stopHeldMove() {
+                if (heldMoveTimer !== null) {
+                    clearInterval(heldMoveTimer);
+                    heldMoveTimer = null;
                 }
             }
 
@@ -185,6 +210,52 @@
             });
 
             playArea.addEventListener('click', () => playArea.focus());
+            touchControls.addEventListener('pointerdown', (event) => {
+                const button = event.target.closest('[data-direction]');
+                if (!button) {
+                    return;
+                }
+                const directions = {
+                    up: [0, -2],
+                    down: [0, 2],
+                    left: [-2, 0],
+                    right: [2, 0],
+                };
+                const direction = directions[button.dataset.direction];
+                if (direction) {
+                    event.preventDefault();
+                    stopHeldMove();
+                    button.setPointerCapture(event.pointerId);
+                    movePlayer(...direction);
+                    heldMoveTimer = window.setInterval(() => {
+                        movePlayer(...direction);
+                    }, 140);
+                }
+            });
+            touchControls.addEventListener('pointerup', stopHeldMove);
+            touchControls.addEventListener('pointercancel', stopHeldMove);
+            touchControls.addEventListener('lostpointercapture', stopHeldMove);
+            window.addEventListener('blur', stopHeldMove);
+            touchControls.addEventListener('click', (event) => {
+                if (event.detail !== 0) {
+                    return;
+                }
+                const button = event.target.closest('[data-direction]');
+                if (!button) {
+                    return;
+                }
+                const directions = {
+                    up: [0, -2],
+                    down: [0, 2],
+                    left: [-2, 0],
+                    right: [2, 0],
+                };
+                const direction = directions[button.dataset.direction];
+                if (direction) {
+                    movePlayer(...direction);
+                }
+            });
+
             playArea.addEventListener('keydown', (event) => {
                 const directions = {
                     ArrowUp: [0, -2],
@@ -205,10 +276,7 @@
                     return;
                 }
                 event.preventDefault();
-                x = Math.max(0, Math.min(100, x + direction[0]));
-                y = Math.max(0, Math.min(100, y + direction[1]));
-                renderPlayer({id: ownPlayerId, name: username, x, y});
-                sendMove();
+                movePlayer(...direction);
             });
 
             chatForm.addEventListener('submit', (event) => {
